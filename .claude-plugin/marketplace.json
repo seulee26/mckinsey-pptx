@@ -1,0 +1,19 @@
+{
+  "name": "axlabs",
+  "owner": {
+    "name": "AX Labs",
+    "email": "seungpillee94@gmail.com",
+    "url": "https://github.com/seulee26"
+  },
+  "plugins": [
+    {
+      "name": "mckinsey-pptx",
+      "description": "McKinsey-style PPTX generator — 40 slide templates + subagent that picks the right one. Built by AX Labs.",
+      "source": {
+        "source": "github",
+        "repo": "seulee26/mckinsey-pptx"
+      },
+      "homepage": "https://github.com/seulee26/mckinsey-pptx"
+    }
+  ]
+}

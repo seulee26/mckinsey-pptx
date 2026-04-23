@@ -1,0 +1,21 @@
+# Build artifacts
+output/
+*.pptx
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.venv/
+
+# OS
+.DS_Store
+
+# Editors
+.vscode/
+.idea/
+
+# Tooling caches
+.omc/
+.claude/settings.local.json

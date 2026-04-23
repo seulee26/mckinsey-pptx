@@ -1,0 +1,29 @@
+{
+  "name": "mckinsey-pptx",
+  "version": "0.1.0",
+  "description": "McKinsey-style PPTX generator with 40 production-ready slide templates (executive summary, BCG matrix, KPI dashboard, roadmap, org chart, historic-forecast, etc.). Ships with a subagent that picks the right template for each slide, defends its choice, and builds a real .pptx file. Built by AX Labs.",
+  "author": {
+    "name": "AX Labs (이승필 / Seungpil Lee)",
+    "email": "seungpillee94@gmail.com",
+    "url": "https://github.com/seulee26"
+  },
+  "repository": "https://github.com/seulee26/mckinsey-pptx",
+  "homepage": "https://github.com/seulee26/mckinsey-pptx",
+  "license": "MIT",
+  "keywords": [
+    "claude-code",
+    "plugin",
+    "pptx",
+    "powerpoint",
+    "mckinsey",
+    "consulting",
+    "slides",
+    "deck",
+    "presentation",
+    "ax-labs",
+    "korean",
+    "strategy"
+  ],
+  "agents": "./agents/",
+  "commands": "./commands/"
+}
