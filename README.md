@@ -1,6 +1,6 @@
 # mckinsey-pptx
 
-> **A Claude Code plugin by [AX Labs](mailto:seungpillee94@gmail.com).**
+> **A Claude Code plugin by [AX Labs](mailto:help@theuxlabs.com).**
 > McKinsey-style PPTX generator — 40 production-ready slide templates that
 > faithfully reproduce the source design (deep navy / bright blue palette,
 > bold-and-rule title, dashed section marker, bottom rule with source + page
@@ -336,7 +336,7 @@ If your organization wants:
 - **On-prem / VPC deployment** of the agent pipeline
 - **Training & enablement** for partner/consulting teams
 
-→ Reach out: **seungpillee94@gmail.com** (subject: `[AX inquiry] <company>`)
+→ Reach out: **help@theuxlabs.com** (subject: `[AX inquiry] <company>`)
 
 Open-source contributions, bug reports, and template requests are welcome
 via GitHub issues.
