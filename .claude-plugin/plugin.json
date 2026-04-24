@@ -23,7 +23,5 @@
     "ax-labs",
     "korean",
     "strategy"
-  ],
-  "agents": "./agents/",
-  "commands": "./commands/"
+  ]
 }
