@@ -60,10 +60,19 @@ def _draw_takeaway(slide, theme, *, top=None, takeaways: Sequence[str],
     # Dashed vertical divider
     add_line(slide, divider_x, ttop, divider_x, ttop + h,
              color=pal.placeholder_gray, width_pt=0.5)
-    # Header
+    # Header — placeholder default = gray `[...]`; real content = dark text.
+    if header == "Key takeaways/main conclusion":
+        header_text = f"[{header}]"
+        header_color = pal.placeholder_gray
+    elif header.startswith("["):
+        header_text = header
+        header_color = pal.placeholder_gray
+    else:
+        header_text = header
+        header_color = pal.text_dark
     tb = add_textbox(slide, left, ttop - 0.05, w, 0.35)
-    write_paragraph(tb.text_frame, f"[{header}]", size=typo.section_title_size,
-                    bold=True, color=pal.text_dark, family=typo.family,
+    write_paragraph(tb.text_frame, header_text, size=typo.section_title_size,
+                    bold=True, color=header_color, family=typo.family,
                     first=True)
     # Header underline
     add_line(slide, left, ttop + 0.30, left + w, ttop + 0.30,
@@ -79,11 +88,33 @@ def _draw_takeaway(slide, theme, *, top=None, takeaways: Sequence[str],
 
 
 def _draw_description_header(slide, theme, *, left, top, width, label="Description"):
+    """Render the '[Description]' header above a chart.
+
+    - `label=None` or empty string: render only the rule, no text.
+    - `label` starts with `[`: render as-is (caller controls bracketing).
+    - `label == "Description"` (template default): render `[Description]` in
+      placeholder styling (gray) to signal the slot is unfilled.
+    - Any other string: render as a real, dark-text header.
+    """
     pal, typo = theme.palette, theme.typography
+    if label is None or label == "":
+        # Just the rule, no header text.
+        add_line(slide, left, top + 0.30, left + width, top + 0.30,
+                 color=pal.rule_gray, width_pt=0.5)
+        return
+    if label == "Description":
+        label_text = f"[{label}]"
+        color = pal.placeholder_gray
+    elif label.startswith("["):
+        label_text = label
+        color = pal.placeholder_gray
+    else:
+        label_text = label
+        color = pal.text_dark
     tb = add_textbox(slide, left, top - 0.05, width, 0.35)
-    write_paragraph(tb.text_frame, f"[{label}]",
+    write_paragraph(tb.text_frame, label_text,
                     size=typo.section_title_size, bold=True,
-                    color=pal.text_dark, family=typo.family, first=True)
+                    color=color, family=typo.family, first=True)
     add_line(slide, left, top + 0.30, left + width, top + 0.30,
              color=pal.rule_gray, width_pt=0.5)
 
@@ -97,13 +128,18 @@ def _draw_axis_and_bars(slide, theme, *, chart_box, data_label,
     pal, typo = theme.palette, theme.typography
     cleft, ctop, cwidth, cheight = chart_box
 
-    # Title above chart: [Data], [Unit]
+    # Title above chart: "Data, Unit" — bracket+gray for template defaults,
+    # dark+unbracketed for real content.
+    lbl_ph = data_label == "Data"
+    unit_ph = data_unit == "Unit"
+    lbl_text = f"[{data_label}]" if lbl_ph else data_label
+    unit_text = f"[{data_unit}]" if unit_ph else data_unit
     tb = add_textbox(slide, cleft, ctop, cwidth - 1.5, 0.3)
     p = tb.text_frame.paragraphs[0]
-    r = p.add_run(); r.text = f"[{data_label}], "
+    r = p.add_run(); r.text = f"{lbl_text}, "
     r.font.size = Pt(typo.section_title_size); r.font.bold = True
     r.font.color.rgb = pal.text_dark; r.font.name = typo.family
-    r2 = p.add_run(); r2.text = f"[{data_unit}]"
+    r2 = p.add_run(); r2.text = unit_text
     r2.font.size = Pt(typo.section_title_size)
     r2.font.color.rgb = pal.placeholder_gray; r2.font.name = typo.family
 
@@ -221,12 +257,14 @@ def _draw_growth_arrow(slide, theme, *, x1, y1, x2, y2, label_pct,
 # ---------- Public slide builders ----------
 
 def _common(prs, *, title, page_number, section_marker, source, footnote, theme,
-            description_left, description_top, description_w):
+            description_left, description_top, description_w,
+            description="Description"):
     slide = blank_slide(prs)
     add_chrome(slide, title=title, theme=theme, page_number=page_number,
                section_marker=section_marker, source=source, footnote=footnote)
     _draw_description_header(slide, theme, left=description_left,
-                              top=description_top, width=description_w)
+                              top=description_top, width=description_w,
+                              label=description)
     return slide
 
 
@@ -236,6 +274,8 @@ def add_column_comparison(prs, *,
                           focus_index: Optional[int] = None,
                           data_label="Data", data_unit="Unit",
                           takeaways: Sequence[str] = (),
+                          description: str = "Description",
+                          takeaway_header: str = "Key takeaways/main conclusion",
                           page_number=None, section_marker=None,
                           source="xx", footnote="1. xx",
                           theme: Theme = DEFAULT_THEME):
@@ -244,12 +284,13 @@ def add_column_comparison(prs, *,
                     footnote=footnote, theme=theme,
                     description_left=DEFAULT_CHART_BOX[0],
                     description_top=DEFAULT_DESCRIPTION_TOP,
-                    description_w=DEFAULT_CHART_BOX[2])
+                    description_w=DEFAULT_CHART_BOX[2],
+                    description=description)
     _draw_axis_and_bars(slide, theme, chart_box=DEFAULT_CHART_BOX,
                         data_label=data_label, data_unit=data_unit,
                         categories=categories, values=values,
                         focus_index=focus_index)
-    _draw_takeaway(slide, theme, takeaways=takeaways)
+    _draw_takeaway(slide, theme, takeaways=takeaways, header=takeaway_header)
     return slide
 
 
@@ -257,7 +298,10 @@ def add_column_simple_growth(prs, *,
                              title="[Column chart with simple growth and takeaways / Insert action title]",
                              categories, values, growth_pct: str = "xx%",
                              data_label="Data", data_unit="Unit",
-                             takeaways=(), page_number=None,
+                             takeaways=(),
+                             description: str = "Description",
+                             takeaway_header: str = "Key takeaways/main conclusion",
+                             page_number=None,
                              section_marker=None, source="xx",
                              footnote="1. xx",
                              theme: Theme = DEFAULT_THEME):
@@ -266,7 +310,8 @@ def add_column_simple_growth(prs, *,
                     footnote=footnote, theme=theme,
                     description_left=DEFAULT_CHART_BOX[0],
                     description_top=DEFAULT_DESCRIPTION_TOP,
-                    description_w=DEFAULT_CHART_BOX[2])
+                    description_w=DEFAULT_CHART_BOX[2],
+                    description=description)
     legend = [(theme.palette.dark_navy, "Actuals")]
     centers, baseline, bw, plot_top, axis_top = _draw_axis_and_bars(
         slide, theme, chart_box=DEFAULT_CHART_BOX,
@@ -281,7 +326,7 @@ def add_column_simple_growth(prs, *,
                            x1=centers[0], y1=first_top - 0.45,
                            x2=centers[-1] + 0.15, y2=last_top - 0.55,
                            label_pct=growth_pct, color=theme.palette.dark_navy)
-    _draw_takeaway(slide, theme, takeaways=takeaways)
+    _draw_takeaway(slide, theme, takeaways=takeaways, header=takeaway_header)
     return slide
 
 
@@ -291,7 +336,10 @@ def add_column_split_growth(prs, *,
                             growth_pct_first: str = "xx%",
                             growth_pct_second: str = "xx%",
                             data_label="Data", data_unit="Unit",
-                            takeaways=(), page_number=None,
+                            takeaways=(),
+                            description: str = "Description",
+                            takeaway_header: str = "Key takeaways/main conclusion",
+                            page_number=None,
                             section_marker=None, source="xx",
                             footnote="1. xx",
                             theme: Theme = DEFAULT_THEME):
@@ -300,7 +348,8 @@ def add_column_split_growth(prs, *,
                     footnote=footnote, theme=theme,
                     description_left=DEFAULT_CHART_BOX[0],
                     description_top=DEFAULT_DESCRIPTION_TOP,
-                    description_w=DEFAULT_CHART_BOX[2])
+                    description_w=DEFAULT_CHART_BOX[2],
+                    description=description)
     legend = [(theme.palette.dark_navy, "Actuals")]
     centers, baseline, bw, plot_top, axis_top = _draw_axis_and_bars(
         slide, theme, chart_box=DEFAULT_CHART_BOX,
@@ -325,7 +374,7 @@ def add_column_split_growth(prs, *,
                            y2=_y(values[-1]) - 0.55,
                            label_pct=growth_pct_second,
                            color=theme.palette.dark_navy)
-    _draw_takeaway(slide, theme, takeaways=takeaways)
+    _draw_takeaway(slide, theme, takeaways=takeaways, header=takeaway_header)
     return slide
 
 
@@ -335,7 +384,10 @@ def add_column_historic_forecast(prs, *,
                                  historic_growth: str = "xx%",
                                  forecast_growth: str = "xx%",
                                  data_label="Data", data_unit="Unit",
-                                 takeaways=(), page_number=None,
+                                 takeaways=(),
+                                 description: str = "Description",
+                                 takeaway_header: str = "Key takeaways/main conclusion",
+                                 page_number=None,
                                  section_marker=None, source="xx",
                                  footnote="1. xx",
                                  theme: Theme = DEFAULT_THEME):
@@ -344,7 +396,8 @@ def add_column_historic_forecast(prs, *,
                     footnote=footnote, theme=theme,
                     description_left=DEFAULT_CHART_BOX[0],
                     description_top=DEFAULT_DESCRIPTION_TOP,
-                    description_w=DEFAULT_CHART_BOX[2])
+                    description_w=DEFAULT_CHART_BOX[2],
+                    description=description)
     legend = [(theme.palette.dark_navy, "Actuals"),
               (theme.palette.bright_blue, "Forecast")]
     centers, baseline, bw, plot_top, axis_top = _draw_axis_and_bars(
@@ -371,5 +424,5 @@ def add_column_historic_forecast(prs, *,
                            y2=_y(values[-1]) - 0.55,
                            label_pct=forecast_growth,
                            color=theme.palette.bright_blue)
-    _draw_takeaway(slide, theme, takeaways=takeaways)
+    _draw_takeaway(slide, theme, takeaways=takeaways, header=takeaway_header)
     return slide

@@ -116,15 +116,25 @@ def _draw_bubble(slide, theme, *, plot_box, x_max, y_max, bubble,
         if isinstance(b.get("color"), str):
             fill = color_map.get(b["color"], fill)
         add_oval(slide, x - d / 2, y - d / 2, d, d, fill=fill)
-        # Label to the right of bubble
+        # Label — placement via b["label_pos"] in {"right","left","top","bottom"}
+        # (default "right"). Use when clusters would otherwise overlap.
         if b.get("label"):
-            tb = add_textbox(slide, x + d / 2 + 0.05, y - 0.12,
-                              1.2, 0.24,
-                              anchor=MSO_ANCHOR.MIDDLE)
+            pos = b.get("label_pos", "right")
+            lw, lh = 1.2, 0.24
+            if pos == "left":
+                lx, ly, align = x - d / 2 - lw - 0.05, y - 0.12, PP_ALIGN.RIGHT
+            elif pos == "top":
+                lx, ly, align = x - lw / 2, y - d / 2 - lh - 0.02, PP_ALIGN.CENTER
+            elif pos == "bottom":
+                lx, ly, align = x - lw / 2, y + d / 2 + 0.02, PP_ALIGN.CENTER
+            else:  # "right"
+                lx, ly, align = x + d / 2 + 0.05, y - 0.12, PP_ALIGN.LEFT
+            tb = add_textbox(slide, lx, ly, lw, lh, anchor=MSO_ANCHOR.MIDDLE)
             write_paragraph(tb.text_frame, b["label"],
                             size=theme.typography.chart_label_size,
                             color=pal.text_dark,
-                            family=theme.typography.family, first=True)
+                            family=theme.typography.family,
+                            align=align, first=True)
 
 
 def _draw_legend_groups(slide, theme, *, top_left, groups, with_size_swatch=True):
@@ -225,6 +235,8 @@ def add_bubble_chart_with_takeaways(prs, *,
                                         ("mid_blue", "Insert group 3"),
                                     ),
                                     takeaways=(),
+                                    description: str = "Description",
+                                    takeaway_header: str = "Key takeaways/main conclusion",
                                     page_number=None, section_marker=None,
                                     source="xx", footnote=None,
                                     theme: Theme = DEFAULT_THEME):
@@ -234,7 +246,8 @@ def add_bubble_chart_with_takeaways(prs, *,
     pal, typo = theme.palette, theme.typography
 
     # Description header on left side
-    _draw_description_header(slide, theme, left=0.45, top=1.45, width=8.5)
+    _draw_description_header(slide, theme, left=0.45, top=1.45, width=8.5,
+                              label=description)
 
     plot_box = (1.05, 2.30, 7.9, 3.55)
     _draw_xy_axis(slide, theme, plot_box=plot_box, x_max=x_max, y_max=y_max,
@@ -246,6 +259,7 @@ def add_bubble_chart_with_takeaways(prs, *,
     _draw_legend_groups(slide, theme, top_left=(1.05, 6.55), groups=groups)
     # Takeaway right side
     _draw_takeaway(slide, theme, takeaways=takeaways,
+                   header=takeaway_header,
                    box=(9.45, 1.45, 3.45, 5.0))
     return slide
 
@@ -274,17 +288,19 @@ def add_growth_share_matrix(prs, *,
     add_rect(slide, pl, midy, pw / 2, ph / 2, fill=pal.soft_gray)           # bottom-left (Dog)
     add_rect(slide, midx, midy, pw / 2, ph / 2, fill=pal.mid_blue)          # bottom-right
 
-    # Quadrant labels
-    label_pads = [
-        ("Question mark", pl + 0.2, pt + 0.15, pal.white),
-        ("Star", midx + 0.2, pt + 0.15, pal.white),
-        ("Dog", pl + 0.2, midy + 0.15, pal.text_dark),
-        ("Cash cow", midx + 0.2, midy + 0.15, pal.white),
+    # Quadrant labels — positioned in corners. DRAWING DEFERRED so they render
+    # on top of bubbles (python-pptx uses insertion-order z-ordering).
+    lbl_w = 2.0
+    qm_x = pl + 0.15                         # top-left of top-left quadrant
+    st_x = pl + pw - lbl_w - 0.15            # top-right of top-right quadrant
+    dg_x = pl + 0.15
+    cc_x = pl + pw - lbl_w - 0.15
+    _quadrant_labels = [
+        ("Question mark", qm_x, pt + 0.15, pal.white, PP_ALIGN.LEFT),
+        ("Star",          st_x, pt + 0.15, pal.white, PP_ALIGN.RIGHT),
+        ("Dog",           dg_x, pt + ph - 0.40, pal.text_dark, PP_ALIGN.LEFT),
+        ("Cash cow",      cc_x, pt + ph - 0.40, pal.white, PP_ALIGN.RIGHT),
     ]
-    for label, lx, ly, color in label_pads:
-        tb = add_textbox(slide, lx, ly, 2.5, 0.3)
-        write_paragraph(tb.text_frame, label, size=typo.section_title_size,
-                        color=color, family=typo.family, first=True)
 
     # Y-axis label
     tb = add_textbox(slide, pl - 0.55, pt - 0.45, 4, 0.3)
@@ -341,6 +357,13 @@ def add_growth_share_matrix(prs, *,
             write_paragraph(tb.text_frame, b["name"],
                             size=typo.chart_label_size, color=pal.white,
                             family=typo.family, first=True)
+
+    # Quadrant labels drawn LAST so they appear on top of bubbles.
+    for label, lx, ly, color, align in _quadrant_labels:
+        tb = add_textbox(slide, lx, ly, lbl_w, 0.30)
+        write_paragraph(tb.text_frame, label, size=typo.section_title_size,
+                        color=color, family=typo.family,
+                        align=align, first=True)
     return slide
 
 

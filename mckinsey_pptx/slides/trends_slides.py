@@ -72,7 +72,7 @@ def add_three_trends_icons(prs, *,
         # Label
         text_left = layout.margin_left_in + icon_d + 0.25
         tb = add_textbox(slide, text_left, y + 0.05, width - icon_d - 0.25, 0.35)
-        write_paragraph(tb.text_frame, f"[{tr.get('label','')}]",
+        write_paragraph(tb.text_frame, tr.get('label', ''),
                         size=typo.section_title_size, bold=True,
                         color=pal.text_dark, family=typo.family, first=True)
         # Bullets
@@ -131,7 +131,7 @@ def add_three_trends_table(prs, *,
                  fill=pal.dark_navy)
         tb = add_textbox(slide, layout.margin_left_in, ry + 0.05,
                          name_w, row_h - 0.30, anchor=MSO_ANCHOR.MIDDLE)
-        write_paragraph(tb.text_frame, f"[{tr.get('name','')}]",
+        write_paragraph(tb.text_frame, tr.get('name', ''),
                         size=typo.section_title_size, bold=True,
                         color=pal.white, family=typo.family,
                         align=PP_ALIGN.CENTER, first=True)
@@ -196,7 +196,7 @@ def add_three_trends_numbered(prs, *,
         tb = add_textbox(slide, layout.margin_left_in + num_d + 0.15,
                          y + 0.10, pill_w, block_h - 0.40,
                          anchor=MSO_ANCHOR.MIDDLE)
-        write_paragraph(tb.text_frame, f"[{tr.get('label','')}]",
+        write_paragraph(tb.text_frame, tr.get('label', ''),
                         size=typo.section_title_size, bold=True,
                         color=pal.white, family=typo.family,
                         align=PP_ALIGN.CENTER, first=True)
@@ -232,11 +232,12 @@ def add_five_key_areas(prs, *,
 
     width = layout.slide_width_in - layout.margin_left_in - layout.margin_right_in
     body_top = 1.85
-    # Header row
-    name_col_x = layout.margin_left_in + 0.7
-    arrow_x = layout.margin_left_in + 3.2
-    desc_col_x = layout.margin_left_in + 4.4
-    tb = add_textbox(slide, name_col_x, body_top, 3.0, 0.32)
+    # Header row — column widths sized so name column stops well before arrow.
+    name_col_x = layout.margin_left_in + 0.7      # = 1.15
+    name_col_w = 2.35                             # ends at 3.50 (before arrow)
+    arrow_x = layout.margin_left_in + 3.6         # = 4.05
+    desc_col_x = layout.margin_left_in + 4.4      # = 4.85
+    tb = add_textbox(slide, name_col_x, body_top, name_col_w, 0.32)
     write_paragraph(tb.text_frame, "Area", size=typo.section_title_size,
                     bold=True, color=pal.text_dark, family=typo.family,
                     first=True)
@@ -262,9 +263,9 @@ def add_five_key_areas(prs, *,
                      fill=pal.soft_gray)
         _add_circle_number(slide, theme, layout.margin_left_in + 0.1,
                             cy - num_d / 2, num_d, i + 1)
-        tb = add_textbox(slide, name_col_x, cy - 0.15, 3.0, 0.32,
+        tb = add_textbox(slide, name_col_x, cy - 0.15, name_col_w, 0.32,
                          anchor=MSO_ANCHOR.MIDDLE)
-        write_paragraph(tb.text_frame, f"[{area.get('name','')}]",
+        write_paragraph(tb.text_frame, area.get('name', ''),
                         size=typo.body_size, bold=True, color=pal.text_dark,
                         family=typo.family, first=True)
         # Arrow between cols (positioned safely between name and description)

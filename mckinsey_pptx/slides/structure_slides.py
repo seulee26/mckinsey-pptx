@@ -13,7 +13,7 @@ from pptx.util import Inches, Pt
 
 from ..base import (
     blank_slide, add_chrome, add_rect, add_oval, add_line, add_textbox,
-    write_paragraph,
+    write_paragraph, enable_text_shrink,
 )
 from ..theme import Theme, DEFAULT_THEME
 
@@ -57,6 +57,7 @@ def add_cover_slide(prs, *,
     write_paragraph(tb.text_frame, title,
                     size=typo.title_size + 16, bold=True,
                     color=pal.text_dark, family=typo.family, first=True)
+    enable_text_shrink(tb.text_frame)
 
     # Subtitle
     if subtitle:
@@ -236,6 +237,7 @@ def add_stat_hero(prs, *,
                     size=typo.title_size + 80, bold=True,
                     color=pal.deep_navy, family=typo.family,
                     align=PP_ALIGN.CENTER, first=True)
+    enable_text_shrink(tb.text_frame)
 
     # Stat label below number
     tb = add_textbox(slide, layout.margin_left_in,

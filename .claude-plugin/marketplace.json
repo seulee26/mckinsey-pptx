@@ -11,7 +11,7 @@
     {
       "name": "axlabs-mckinsey-pptx",
       "description": "McKinsey-style PPTX generator — 40 slide templates + subagent that picks the right one. Built by AX Labs.",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "source": "./",
       "category": "productivity",
       "homepage": "https://github.com/seulee26/mckinsey-pptx",

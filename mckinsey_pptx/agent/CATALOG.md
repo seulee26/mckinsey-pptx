@@ -122,7 +122,8 @@ Use when there is no separate takeaway pane needed.
 `bubble_chart_takeaways`), or you have categorical 2x2/3x3 quadrants
 (use `growth_share` or `prioritization_matrix`).
 **Required inputs:**
-- `bubbles: list[{label: str, x: float, y: float, size: float, group: "blue_light"|"blue_dark"|"blue_royal"|"navy"}]`
+- `bubbles: list[{label: str, x: float, y: float, size: float, group: "blue_light"|"blue_dark"|"blue_royal"|"navy", label_pos?: "right"|"left"|"top"|"bottom"}]`
+  - `label_pos` controls where the bubble's label renders relative to the bubble — defaults to `"right"`. Use `"left"`/`"top"`/`"bottom"` to break cluster overlaps when multiple bubbles are close together.
 **Optional inputs:**
 - `x_max, y_max: float`, `x_label, y_label, x_unit, y_unit: str`
 - `groups: list[(color, label)]` — legend

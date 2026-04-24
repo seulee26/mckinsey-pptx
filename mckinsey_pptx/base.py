@@ -4,12 +4,22 @@ from typing import Optional, Iterable
 
 from pptx.util import Inches, Pt, Emu
 from pptx.enum.shapes import MSO_SHAPE
-from pptx.enum.text import PP_ALIGN, MSO_ANCHOR
+from pptx.enum.text import PP_ALIGN, MSO_ANCHOR, MSO_AUTO_SIZE
 from pptx.dml.color import RGBColor
 from pptx.oxml.ns import qn
 from lxml import etree
 
 from .theme import Theme, DEFAULT_THEME
+
+
+def enable_text_shrink(text_frame):
+    """Enable PowerPoint's auto-shrink so long text scales down to fit the
+    textbox instead of overflowing beyond its bottom edge. Safe no-op if the
+    rendering engine ignores the flag."""
+    try:
+        text_frame.auto_size = MSO_AUTO_SIZE.TEXT_TO_SHAPE_FIT
+    except Exception:
+        pass
 
 
 # ---------- text helpers ----------
@@ -161,6 +171,8 @@ def add_title(slide, text, theme: Theme = DEFAULT_THEME, *, with_underline=True)
                      width, layout.title_height_in)
     write_paragraph(tb.text_frame, text, size=typo.title_size, bold=True,
                     color=pal.text_dark, family=typo.family, first=True)
+    # Auto-shrink long titles so they don't push through the underline.
+    enable_text_shrink(tb.text_frame)
     if with_underline:
         add_line(slide, layout.margin_left_in, layout.title_underline_top_in,
                  layout.slide_width_in - layout.margin_right_in,
@@ -170,17 +182,26 @@ def add_title(slide, text, theme: Theme = DEFAULT_THEME, *, with_underline=True)
 
 
 def add_subtitle_placeholder(slide, text, theme: Theme = DEFAULT_THEME, top_in=1.4):
+    """Subtitle below the title. If `text` looks like an empty template
+    placeholder (starts with `[` or is the default `[Insert subtitle]`),
+    render with the gray dashed-box placeholder treatment. Otherwise render
+    as a real subtitle (dark text, no dashed border)."""
     layout = theme.layout
     pal = theme.palette
     typo = theme.typography
     width = layout.slide_width_in - layout.margin_left_in - layout.margin_right_in
+    is_placeholder = isinstance(text, str) and text.strip().startswith("[")
     tb = add_textbox(slide, layout.margin_left_in, top_in, width, 0.32)
-    write_paragraph(tb.text_frame, text, size=typo.body_size, italic=False,
-                    color=pal.placeholder_gray, family=typo.family, first=True)
-    # dashed border
-    add_rect(slide, layout.margin_left_in - 0.02, top_in - 0.02,
-             width + 0.04, 0.36, fill=None, line=pal.placeholder_gray,
-             line_width=0.5)
+    write_paragraph(
+        tb.text_frame, text, size=typo.body_size, italic=False,
+        color=pal.placeholder_gray if is_placeholder else pal.text_dark,
+        family=typo.family, first=True,
+    )
+    if is_placeholder:
+        # dashed border — only for literal placeholders
+        add_rect(slide, layout.margin_left_in - 0.02, top_in - 0.02,
+                 width + 0.04, 0.36, fill=None, line=pal.placeholder_gray,
+                 line_width=0.5)
     return tb
 
 

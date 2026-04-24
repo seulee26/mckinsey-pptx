@@ -88,8 +88,10 @@ def add_phases_chevron_3(prs, *,
 
     for x, ph in zip(chev_xs, phases):
         tb = add_textbox(slide, x + 0.20, tf_y, chev_w - 0.20, 0.28)
+        tf = ph.get('timeframe', 'Insert timeframe')
+        tf_display = f"[{tf}]" if tf == 'Insert timeframe' else tf
         write_paragraph(tb.text_frame,
-                        f"[{ph.get('timeframe', 'Insert timeframe')}]",
+                        tf_display,
                         size=typo.chart_label_size,
                         color=pal.placeholder_gray,
                         family=typo.family, first=True)
@@ -281,8 +283,10 @@ def add_waves_timeline_4(prs, *,
         # Timeframe (top)
         tb = add_textbox(slide, cx - slot / 2 + 0.3, body_top,
                          slot - 0.3, 0.25)
+        tf = w.get('timeframe', 'Insert timeframe')
+        tf_display = f"[{tf}]" if tf == 'Insert timeframe' else tf
         write_paragraph(tb.text_frame,
-                        f"[{w.get('timeframe', 'Insert timeframe')}]",
+                        tf_display,
                         size=typo.chart_label_size,
                         color=pal.placeholder_gray, family=typo.family,
                         first=True)
@@ -482,13 +486,16 @@ def add_overview_areas(prs, *,
 
     badge_d = 0.42
     head_h = 0.50
-    card_h = body_bottom - body_top - badge_d / 2
+    # Card starts below the badge entirely (no overlap with header text).
+    badge_gap = 0.08
+    card_top_offset = badge_d + badge_gap
+    card_h = body_bottom - body_top - card_top_offset
 
     letters = "ABCDEFGHIJ"
 
     for i, area in enumerate(areas):
         cx = layout.margin_left_in + i * (card_w + gap)
-        card_top = body_top + badge_d / 2
+        card_top = body_top + card_top_offset
         # Card body (light gray)
         add_rect(slide, cx, card_top, card_w, card_h, fill=pal.soft_gray)
         # Header band (deep navy)
@@ -498,7 +505,7 @@ def add_overview_areas(prs, *,
         write_paragraph(tb.text_frame, area.get("name", f"[Area {i+1}]"),
                         size=typo.body_size, bold=True, color=pal.white,
                         family=typo.family, first=True)
-        # Letter badge (circle straddling top edge)
+        # Letter badge (circle sitting entirely above the header, not straddling)
         bx = cx + (card_w - badge_d) / 2
         by = body_top
         add_oval(slide, bx, by, badge_d, badge_d, fill=pal.white,

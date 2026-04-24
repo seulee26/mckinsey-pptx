@@ -430,9 +430,11 @@ def add_team_chart(prs, *,
                 color = pal.deep_navy
             tb = add_textbox(slide, cx + 0.10, ry, rd, rd,
                              anchor=MSO_ANCHOR.MIDDLE)
-            # Person icon glyph
-            write_paragraph(tb.text_frame, "♟",
-                            size=12, color=color,
+            # Person icon glyph — use a widely-supported bullet instead of
+            # the chess-pawn codepoint, which falls back to "▲" on many
+            # Korean system fonts.
+            write_paragraph(tb.text_frame, "●",
+                            size=10, color=color,
                             family=typo.family, align=PP_ALIGN.CENTER,
                             first=True)
             tb = add_textbox(slide, cx + 0.10 + rd + 0.08, ry,

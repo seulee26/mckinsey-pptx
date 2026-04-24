@@ -33,13 +33,15 @@ def _draw_axis_frame(slide, theme, *, chart_box, data_label, data_unit,
     pal, typo = theme.palette, theme.typography
     cleft, ctop, cwidth, cheight = chart_box
 
-    # [Data], [Unit] header
+    # Data/Unit header — bracket+gray for defaults, dark for real content.
+    lbl_text = f"[{data_label}]" if data_label == "Data" else data_label
+    unit_text = f"[{data_unit}]" if data_unit == "Unit" else data_unit
     tb = add_textbox(slide, cleft, ctop, cwidth - 1.5, 0.30)
     p = tb.text_frame.paragraphs[0]
-    r = p.add_run(); r.text = f"[{data_label}], "
+    r = p.add_run(); r.text = f"{lbl_text}, "
     r.font.size = Pt(typo.section_title_size); r.font.bold = True
     r.font.color.rgb = pal.text_dark; r.font.name = typo.family
-    r2 = p.add_run(); r2.text = f"[{data_unit}]"
+    r2 = p.add_run(); r2.text = unit_text
     r2.font.size = Pt(typo.section_title_size)
     r2.font.color.rgb = pal.placeholder_gray; r2.font.name = typo.family
 
@@ -88,6 +90,8 @@ def add_stacked_column_chart(prs, *,
                               series: Sequence[Dict],
                               data_label="Data", data_unit="Unit",
                               takeaways: Sequence[str] = (),
+                              description: str = "Description",
+                              takeaway_header: str = "Key takeaways/main conclusion",
                               show_totals: bool = True,
                               page_number=None, section_marker=None,
                               source="xx", footnote="1. xx",
@@ -102,7 +106,8 @@ def add_stacked_column_chart(prs, *,
 
     _draw_description_header(slide, theme, left=DEFAULT_CHART_BOX[0],
                               top=DEFAULT_DESCRIPTION_TOP,
-                              width=DEFAULT_CHART_BOX[2])
+                              width=DEFAULT_CHART_BOX[2],
+                              label=description)
     chart_box = DEFAULT_CHART_BOX
 
     # totals per category
@@ -122,7 +127,7 @@ def add_stacked_column_chart(prs, *,
 
     n = len(categories)
     if n == 0 or axis_top <= 0:
-        _draw_takeaway(slide, theme, takeaways=takeaways)
+        _draw_takeaway(slide, theme, takeaways=takeaways, header=takeaway_header)
         return slide
     slot_w = pw / n
     bar_w = slot_w * 0.55
@@ -165,7 +170,7 @@ def add_stacked_column_chart(prs, *,
                         size=typo.chart_axis_size, color=pal.text_dark,
                         family=typo.family, align=PP_ALIGN.CENTER, first=True)
 
-    _draw_takeaway(slide, theme, takeaways=takeaways)
+    _draw_takeaway(slide, theme, takeaways=takeaways, header=takeaway_header)
     return slide
 
 
@@ -177,6 +182,8 @@ def add_grouped_column_chart(prs, *,
                               series: Sequence[Dict],
                               data_label="Data", data_unit="Unit",
                               takeaways: Sequence[str] = (),
+                              description: str = "Description",
+                              takeaway_header: str = "Key takeaways/main conclusion",
                               show_values: bool = True,
                               page_number=None, section_marker=None,
                               source="xx", footnote="1. xx",
@@ -191,7 +198,8 @@ def add_grouped_column_chart(prs, *,
 
     _draw_description_header(slide, theme, left=DEFAULT_CHART_BOX[0],
                               top=DEFAULT_DESCRIPTION_TOP,
-                              width=DEFAULT_CHART_BOX[2])
+                              width=DEFAULT_CHART_BOX[2],
+                              label=description)
     chart_box = DEFAULT_CHART_BOX
 
     max_val = 0
@@ -212,7 +220,7 @@ def add_grouped_column_chart(prs, *,
     n_cat = len(categories)
     n_ser = max(len(series), 1)
     if n_cat == 0 or axis_top <= 0:
-        _draw_takeaway(slide, theme, takeaways=takeaways)
+        _draw_takeaway(slide, theme, takeaways=takeaways, header=takeaway_header)
         return slide
     slot_w = pw / n_cat
     group_w = slot_w * 0.75
@@ -243,7 +251,7 @@ def add_grouped_column_chart(prs, *,
                         size=typo.chart_axis_size, color=pal.text_dark,
                         family=typo.family, align=PP_ALIGN.CENTER, first=True)
 
-    _draw_takeaway(slide, theme, takeaways=takeaways)
+    _draw_takeaway(slide, theme, takeaways=takeaways, header=takeaway_header)
     return slide
 
 
@@ -255,6 +263,8 @@ def add_line_chart(prs, *,
                    series: Sequence[Dict],
                    data_label="Data", data_unit="Unit",
                    takeaways: Sequence[str] = (),
+                   description: str = "Description",
+                   takeaway_header: str = "Key takeaways/main conclusion",
                    show_markers: bool = True,
                    show_values_for: Optional[Sequence[str]] = None,
                    page_number=None, section_marker=None,
@@ -270,7 +280,8 @@ def add_line_chart(prs, *,
 
     _draw_description_header(slide, theme, left=DEFAULT_CHART_BOX[0],
                               top=DEFAULT_DESCRIPTION_TOP,
-                              width=DEFAULT_CHART_BOX[2])
+                              width=DEFAULT_CHART_BOX[2],
+                              label=description)
     chart_box = DEFAULT_CHART_BOX
 
     color_map = {
@@ -310,7 +321,7 @@ def add_line_chart(prs, *,
 
     n_pts = len(categories)
     if n_pts == 0 or axis_top <= 0:
-        _draw_takeaway(slide, theme, takeaways=takeaways)
+        _draw_takeaway(slide, theme, takeaways=takeaways, header=takeaway_header)
         return slide
     if n_pts == 1:
         x_step = 0
@@ -357,5 +368,5 @@ def add_line_chart(prs, *,
                         size=typo.chart_axis_size, color=pal.text_dark,
                         family=typo.family, align=PP_ALIGN.CENTER, first=True)
 
-    _draw_takeaway(slide, theme, takeaways=takeaways)
+    _draw_takeaway(slide, theme, takeaways=takeaways, header=takeaway_header)
     return slide

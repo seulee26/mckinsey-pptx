@@ -105,6 +105,26 @@ depend on them.
    should obviously contain content. Keep bullets short, parallel, and
    takeaway-driven (each starts with a verb or noun phrase, no full sentences).
 
+   **Layout/overflow discipline — non-negotiable:**
+   - Titles ≤ 50 chars (Korean) / 70 chars (English). Long titles wrap and
+     collide with the title underline at y=1.15".
+   - Bullet text ≤ 15 words per line. In dense templates (`overview_areas`,
+     `phases_table_4`, `waves_timeline_4`, `gantt_timeline`) keep each bullet
+     ≤ 6 Korean words / 10 English words — columns are narrow (<2").
+   - Never reuse the literal `[Insert ...]` placeholder text — if the template
+     accepts `subtitle`, `description`, or `takeaway_header`, supply a real
+     value. Literal `[...]` content triggers the gray dashed-placeholder
+     styling on purpose; you don't want that in a real deck.
+   - For column/stacked/grouped/line/bubble chart slides, **always pass**
+     `description=...` and `takeaway_header=...` kwargs. Otherwise they render
+     literal `[Description]` / `[Key takeaways/main conclusion]` headers.
+   - Korean text is ~1.3× wider than Latin at the same point size. If you're
+     using Korean, keep content ~25% shorter than the English equivalent you'd
+     write.
+   - For `three_trends_icons` / `five_key_areas` / `three_trends_table`, the
+     `label` / `name` fields are now rendered as-is (no auto-brackets). Write
+     `"원가 경쟁력"`, not `"[원가 경쟁력]"`.
+
 6. **Generate the build script.** Write a Python script at
    `output/agent_<slug>.py` in the user's working directory that:
    - Prepends `${CLAUDE_PLUGIN_ROOT}` to `sys.path` so imports resolve.
@@ -116,15 +136,22 @@ depend on them.
 7. **Build the deck.** `python3 output/agent_<slug>.py` — capture and report
    any errors. If the build fails, fix the spec and rebuild.
 
-8. **Render to verify (optional).**
+8. **Render to verify — MANDATORY when tools are available.** Most layout
+   bugs (text overflow, labels occluded by shapes, Korean wrap issues) are
+   only visible after rendering. Run:
    ```bash
    soffice --headless --convert-to pdf --outdir output/preview_<slug> \
        output/<slug>.pptx && \
    pdftoppm -png -r 80 output/preview_<slug>/<slug>.pdf \
        output/preview_<slug>/slide
    ```
-   This produces PNG previews you can sanity-check (overlap, missing labels).
-   Skip silently if `soffice` / `pdftoppm` are not installed.
+   Then read 2–3 of the generated PNGs with the Read tool and visually
+   inspect for: (a) text running past card/box boundaries, (b) labels hidden
+   behind shapes, (c) titles wrapping into the underline rule, (d) chart
+   value labels stacking on top of each other. If any slide looks broken,
+   shorten the offending content and rebuild. Only skip this step if
+   `soffice` / `pdftoppm` are not installed — in that case, state clearly
+   in your report that the deck was not visually verified.
 
 9. **Report back to the user** with:
    - The output `.pptx` path.
