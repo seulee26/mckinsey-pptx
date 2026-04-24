@@ -1,6 +1,6 @@
 # axlabs-mckinsey-pptx
 
-> **[AX Labs]((https://theaxlabs.com/))가 만든 Claude Code 플러그인입니다.**
+> **[AX Labs](https://theaxlabs.com/)가 만든 Claude Code 플러그인입니다.**
 > 맥킨지 스타일 PPTX 생성기 — 원본 디자인(딥네이비/브라이트 블루 팔레트, 굵은 제목 + 하단 라인, 점선 섹션 마커, 출처·페이지 번호가 있는 바닥 규칙)을 충실히 재현한 40개의 프로덕션 레벨 슬라이드 템플릿을 제공합니다. `python-pptx` 기반으로 모든 도형을 네이티브로 그려 레퍼런스와 동일한 룩앤필을 유지합니다.
 
 **Claude Code 서브에이전트**(`mckinsey-slide-agent`)가 함께 제공되어, 슬라이드마다 가장 적합한 템플릿을 선택하고 그 선택 이유를 설명한 뒤, 한 문단 짜리 브리프로부터 실제 `.pptx` 파일을 빌드합니다. `/mckinsey-deck` 슬래시 커맨드도 함께 제공됩니다.
