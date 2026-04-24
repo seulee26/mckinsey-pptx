@@ -1,5 +1,7 @@
 {
+  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
   "name": "axlabs",
+  "description": "AX Labs plugins for Claude Code — McKinsey-style consulting deliverables and more.",
   "owner": {
     "name": "AX Labs",
     "email": "help@theuxlabs.com",
@@ -7,13 +9,27 @@
   },
   "plugins": [
     {
-      "name": "mckinsey-pptx",
+      "name": "axlabs-mckinsey-pptx",
       "description": "McKinsey-style PPTX generator — 40 slide templates + subagent that picks the right one. Built by AX Labs.",
-      "source": {
-        "source": "github",
-        "repo": "seulee26/mckinsey-pptx"
+      "version": "0.1.0",
+      "source": "./",
+      "category": "productivity",
+      "homepage": "https://github.com/seulee26/mckinsey-pptx",
+      "author": {
+        "name": "AX Labs",
+        "email": "help@theuxlabs.com",
+        "url": "https://github.com/seulee26"
       },
-      "homepage": "https://github.com/seulee26/mckinsey-pptx"
+      "tags": [
+        "pptx",
+        "powerpoint",
+        "mckinsey",
+        "consulting",
+        "slides",
+        "deck",
+        "presentation"
+      ]
     }
-  ]
+  ],
+  "version": "0.1.0"
 }

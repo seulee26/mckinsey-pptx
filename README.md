@@ -24,7 +24,7 @@ Inside Claude Code:
 
 ```
 /plugin marketplace add seulee26/mckinsey-pptx
-/plugin install mckinsey-pptx@axlabs
+/plugin install axlabs-mckinsey-pptx@axlabs
 ```
 
 Then install the Python dependencies once on your machine:
